@@ -1,0 +1,5 @@
+*.py
+.vscode
+
+*.asm
+tic_tac_toe
