@@ -15,13 +15,17 @@ $(DEPS): $(SRC)/$(DEPS).cpp $(HEADERS)
 	$(CC) $(SRC)/$(DEPS).cpp $(OBS) -o $(DEPS) $(CARGS)
 
 
-.PHONY: clean summary
+.PHONY: clean summary check
 clean:
 	rm $(DEPS)
 
 # number of lines in src
 summary:
 	wc -l src/*
+
+# check if can build
+check: $(SRC)/$(DEPS).cpp $(HEADERS)
+	$(CC) $(SRC)/$(DEPS).cpp $(OBS) $(CARGS) -fsyntax-only
 
 # run tests
 test: tests/main.cpp $(OBS)

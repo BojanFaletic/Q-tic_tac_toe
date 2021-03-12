@@ -7,8 +7,8 @@ class Game {
 private:
   t_board tic_tac_toe;
   int current_player;
+  bool is_active;
   int move_counter;
-  int status;
 
 public:
   Game() { this->reset(); };
@@ -17,7 +17,7 @@ public:
     tic_tac_toe = {board::EMPTY_SQUARE};
     current_player = board::PLAYER1;
     move_counter = 0;
-    status = reward::NONE;
+    is_active = true;
   }
 
   int player() { return current_player; }
@@ -36,10 +36,7 @@ public:
 
   bool is_full() {
     const int number_of_squares = 9;
-    if (move_counter == number_of_squares) {
-      return true;
-    }
-    return false;
+    return move_counter == number_of_squares;
   }
 
   void increment_move_cnt() { move_counter++; }
@@ -48,46 +45,42 @@ public:
     return tic_tac_toe[column][row] == board::EMPTY_SQUARE;
   }
 
-  int make_valid_move(int row, int column) {
+  status make_valid_move(int row, int column) {
     tic_tac_toe[column][row] = player();
     increment_move_cnt();
     if (is_finished(row, column, player())) {
+      is_active = false;
       return status::FINISHED;
     }
     return status::IDLE;
   }
 
-  int play(int action, t_board &observation, t_player &current_player,
-           t_reward &reward) {
-
-    status = status::IDLE;
-    reward = reward::LOOSE;
-
+  status play(int action, t_board &observation, t_player &current_player) {
     if (action < 0 || action > 8) {
-      status = status::INVALID_MOVE;
-      return status;
-    }
-
-    if (is_full()) {
-      status = status::FINISHED;
-      return status;
+      is_active = false;
+      return status::INVALID_MOVE;
     }
 
     const int row = action % 3;
     const int column = action / 3;
+    status st{status::IDLE};
 
     if (is_valid_move(row, column)) {
-      status = make_valid_move(row, column);
+      st = make_valid_move(row, column);
       swap_player();
-      reward = reward::NONE;
     } else {
-      reward = reward::LOOSE;
-      status = status::INVALID_MOVE;
+      is_active = false;
+      st = status::INVALID_MOVE;
     }
 
     current_player = player();
     observation = tic_tac_toe;
-    return status;
+
+    if (is_full()) {
+      is_active = false;
+      return status::FINISHED;
+    }
+    return st;
   }
 
   void set_board(t_board new_board, t_player new_player) {
@@ -102,5 +95,5 @@ public:
     return os;
   }
 
-  bool is_game_active() { return status == status::IDLE; }
+  bool is_game_active() { return is_active; }
 };
