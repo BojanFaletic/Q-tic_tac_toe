@@ -2,21 +2,31 @@ CC=g++
 CFLAGS=-Wall -Wextra -Wpedantic
 CSTD=--std=c++20
 COPT=-O3
+SRC=src
 
+OBS=src/board.cpp
 DEPS=tic_tac_toe
+HEADERS=src/game.hpp src/player.hpp
 
 CARGS=$(CSTD) $(CFLAGS) $(COPT)
 
-$(DEPS): $(DEPS).cpp
-	$(CC) $(DEPS).cpp -o $(DEPS) $(CARGS)
+# build project
+$(DEPS): $(SRC)/$(DEPS).cpp $(HEADERS)
+	$(CC) $(SRC)/$(DEPS).cpp $(OBS) -o $(DEPS) $(CARGS)
 
 
-.PHONY: clean
+.PHONY: clean summary
 clean:
 	rm $(DEPS)
 
+# number of lines in src
+summary:
+	wc -l src/*
+
+# run tests
+test: tests/main.cpp $(OBS)
+	$(CC) tests/main.cpp -lgtest $(CARGS) $(OBS) -o test
+
+# dissasemble program
 diss.asm: $(DEPS).cpp
 	objdump -d $(DEPS) -M MISP > diss.asm
-
-
-# -shared makes shared objects
