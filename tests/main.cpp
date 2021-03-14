@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "../src/game.hpp"
-#include "../src/player.hpp"
-#include "../src/Q_table.hpp"
+#include "game.hpp"
+#include "player.hpp"
+#include "Q_table.hpp"
 #include <cmath>
 #include <iostream>
 

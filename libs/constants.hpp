@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <stdlib.h>
 
 namespace board {
 const int PLAYER1 = -1;

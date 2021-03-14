@@ -1,36 +1,82 @@
-CC=g++
-CFLAGS=-Wall -Wextra -Wpedantic
-CSTD=--std=c++20
-COPT=-O3
-SRC=src
+.PHONY: clean check run help
+.DEFAULT_GOAL := help
 
-OBS=src/board.cpp
-DEPS=tic_tac_toe
-HEADERS=src/game.hpp src/player.hpp
+### FILE STRUCTURE ###
+BASEDIR = .
+BUILDDIR = $(BASEDIR)/build
 
-CARGS=$(CSTD) $(CFLAGS) $(COPT)
+BUILDSRC = $(BUILDDIR)/src
+BUILDAPP = $(BUILDDIR)/main
+BUILDTEST = $(BUILDDIR)/test
+
+LIBDIR = $(BASEDIR)/libs
+SRCDIR = $(BASEDIR)/src
+TESTDIR = $(BASEDIR)/tests
+
+LIBFILES = $(wildcard $(LIBDIR)/*.cpp)
+SRCFILES = $(wildcard $(SRCDIR)/*.cpp)
+TESTFILES = $(wildcard $(TESTDIR)/*.cpp)
+
+OBJ_FILES := $(patsubst $(LIBDIR)/%.cpp,$(BUILDSRC)/%.o,$(LIBFILES))
+SRC_FILES := $(patsubst $(SRCDIR)/%.cpp,$(BUILDAPP)/%.o,$(SRCFILES))
+TEST_FILES := $(patsubst $(TESTDIR)/%.cpp,$(BUILDTEST)/%.o,$(TESTFILES))
+
+
+### COMPILER FLAGS ###
+LDFLAGS=
+CPPFLAGS=--std=c++20 -I./libs
+CXXFLAGS=-O3
+
+
+### PROJECT
+PROJECT = tic_tac_toe
+TEST = test
+
+
+run: $(PROJECT)
+	./$(PROJECT)
+
+check: $(TEST)
+	./$(TEST)
+
+clean:
+	rm -f $(BUILDSRC)/*.o $(BUILDAPP)/*.o $(BUILDTEST)/*.o $(TEST) $(PROJECT)
+
+summary:
+	wc -l libs/* src/*
+
+help:
+	@echo "** HELP **"
+	@echo "make run: build && run program"
+	@echo "make check: build && run test"
+	@echo "make summary: count number of lines in libs and src"
+	@echo "make clean: remove all object files"
+
+
+### TUTORIAL ON MAKE
+# This is how Makefile works
+# all: library.cpp main.cpp
+# $@ evaluates to all
+# $< evaluates to library.cpp
+# $^ evaluates to library.cpp main.cpp
 
 # build project
-$(DEPS): $(SRC)/$(DEPS).cpp $(HEADERS)
-	$(CC) $(SRC)/$(DEPS).cpp $(OBS) -o $(DEPS) $(CARGS)
+$(PROJECT): $(SRC_FILES) $(OBJ_FILES)
+	g++ $(LDFLAGS) -o $@ $^
+
+# build test
+$(TEST): $(TEST_FILES) $(OBJ_FILES)
+	g++ -lgtest $(LDFLAGS) -o $@ $^
 
 
-.PHONY: clean summary check
-clean:
-	rm $(DEPS)
+# build lib objects
+$(BUILDSRC)/%.o: $(LIBDIR)/%.cpp
+	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-# number of lines in src
-summary:
-	wc -l src/*
+# build main object
+$(BUILDAPP)/%.o: $(SRCDIR)/%.cpp
+	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-# check if can build
-check: $(SRC)/$(DEPS).cpp $(HEADERS)
-	$(CC) $(SRC)/$(DEPS).cpp $(OBS) $(CARGS) -fsyntax-only
-
-# run tests
-test: tests/main.cpp $(OBS)
-	$(CC) tests/main.cpp -lgtest $(CARGS) $(OBS) -o test
-
-# dissasemble program
-diss.asm: $(DEPS).cpp
-	objdump -d $(DEPS) -M MISP > diss.asm
+# build test object
+$(BUILDTEST)/%.o: $(TESTDIR)/%.cpp
+	g++ -lgtest $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
