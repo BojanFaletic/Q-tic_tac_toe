@@ -1,4 +1,4 @@
-.PHONY: clean check run help
+.PHONY: clean check run help build
 .DEFAULT_GOAL := run
 
 ### FILE STRUCTURE ###
@@ -34,6 +34,8 @@ CXXFLAGS=-O3
 PROJECT = tic_tac_toe
 TEST = test
 
+build: $(PROJECT)
+
 
 run: $(PROJECT)
 	./$(PROJECT)
@@ -52,6 +54,7 @@ help:
 	@echo "make run: build && run program"
 	@echo "make check: build && run test"
 	@echo "make summary: count number of lines in libs and src"
+	@echo "make build: combile project"
 	@echo "make clean: remove all object files"
 
 

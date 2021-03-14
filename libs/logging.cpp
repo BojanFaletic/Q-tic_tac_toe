@@ -1,6 +1,8 @@
 #include "logging.hpp"
 
 const char *q_table_fname = "model/q_table.dat";
+const char *q_table_fname_p1 = "model/q_table_p1.dat";
+const char *q_table_fname_p2 = "model/q_table_p2.dat";
 
 int split_name_and_path(std::string full_fname, std::string &folder, std::string &name)
 {
@@ -25,7 +27,7 @@ void create_folder(const std::string f_name)
   }
 }
 
-int table_to_file(std::map<int, float> &q_table)
+int table_to_file(std::map<int, float> &q_table, int player_id)
 {
 
   std::string folder, name;
@@ -36,7 +38,18 @@ int table_to_file(std::map<int, float> &q_table)
   create_folder(folder);
 
   std::ofstream outfile;
-  outfile.open(q_table_fname);
+  if (player_id == board::PLAYER1)
+  {
+    outfile.open(q_table_fname_p1);
+  }
+  else if (player_id == board::PLAYER2)
+  {
+    outfile.open(q_table_fname_p2);
+  }
+  else
+  {
+    return EXIT_FAILURE;
+  }
 
   int size_of_map = q_table.size();
   int idx = 0;
@@ -61,7 +74,7 @@ int table_to_file(std::map<int, float> &q_table)
   return EXIT_FAILURE;
 }
 
-int table_from_file(std::map<int, float> &q_table)
+int table_from_file(std::map<int, float> &q_table, int player_id)
 {
   std::string folder, name;
   if (split_name_and_path(q_table_fname, folder, name))
@@ -70,7 +83,19 @@ int table_from_file(std::map<int, float> &q_table)
   }
 
   std::ifstream instream;
-  instream.open(q_table_fname);
+  if (player_id == board::PLAYER1)
+  {
+    instream.open(q_table_fname_p1);
+  }
+  else if (player_id == board::PLAYER2)
+  {
+    instream.open(q_table_fname_p2);
+  }
+  else
+  {
+    return EXIT_FAILURE;
+  }
+
   if (!instream.is_open())
   {
     std::cout << "No model file found!\n";

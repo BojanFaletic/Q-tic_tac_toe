@@ -11,15 +11,24 @@ private:
   int current_player;
   bool is_active;
   int move_counter;
+  int player_1_wins, player_2_wins;
+  int total_games;
 
 public:
-  Game() { this->reset(); };
+  Game()
+  {
+    player_1_wins = 0;
+    player_2_wins = 0;
+    total_games = 0;
+    this->reset();
+  };
 
   void reset()
   {
     tic_tac_toe = {board::EMPTY_SQUARE};
     current_player = (rand() % 2) ? board::PLAYER1 : board::PLAYER2;
     move_counter = 0;
+    total_games++;
     is_active = true;
   }
 
@@ -62,7 +71,16 @@ public:
     if (is_finished(row, column, player()))
     {
       is_active = false;
-      return (current_player == board::PLAYER1) ? status::WIN_PLAYER1 : status::WIN_PLAYER2;
+      status st = (current_player == board::PLAYER1) ? status::WIN_PLAYER1 : status::WIN_PLAYER2;
+      if (st == status::WIN_PLAYER1)
+      {
+        player_1_wins++;
+      }
+      if (st == status::WIN_PLAYER2)
+      {
+        player_2_wins++;
+      }
+      return st;
     }
     return status::IDLE;
   }
@@ -108,6 +126,15 @@ public:
   }
 
   void observe(t_board &board) { board = tic_tac_toe; }
+
+  void number_of_wins(int &p1_wins, int &p2_wins){
+    p1_wins = player_1_wins;
+    p2_wins = player_2_wins;
+  }
+
+  int number_of_games(){
+    return total_games-1;
+  }
 
   friend std::ostream &operator<<(std::ostream &os, Game &G)
   {
