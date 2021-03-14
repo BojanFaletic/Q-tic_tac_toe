@@ -132,8 +132,8 @@ void play_n_games(int n_games, bool save_model, bool load_model, bool print_summ
   t_action action;
   status st;
 
-  bool verbose_moves = true;
-  bool verbose_ending = true;
+  bool verbose_moves = false;
+  bool verbose_ending = false;
 
   int wins_player1 = 0;
   int wins_player2 = 0;

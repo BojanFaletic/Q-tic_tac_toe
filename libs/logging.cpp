@@ -44,6 +44,10 @@ int table_to_file(std::map<int, float> &q_table)
   {
     for (auto it = q_table.begin(); it != q_table.end(); it++)
     {
+      if (it->second == 0)
+      {
+        continue;
+      }
       outfile << it->first << ":" << it->second;
       idx++;
       if (idx != size_of_map)
