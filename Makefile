@@ -1,5 +1,5 @@
 .PHONY: clean check run help
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := run
 
 ### FILE STRUCTURE ###
 BASEDIR = .
@@ -14,6 +14,8 @@ SRCDIR = $(BASEDIR)/src
 TESTDIR = $(BASEDIR)/tests
 
 LIBFILES = $(wildcard $(LIBDIR)/*.cpp)
+LIBHEADERS = $(wildcard $(LIBDIR)/*.hpp)
+
 SRCFILES = $(wildcard $(SRCDIR)/*.cpp)
 TESTFILES = $(wildcard $(TESTDIR)/*.cpp)
 
@@ -70,13 +72,13 @@ $(TEST): $(TEST_FILES) $(OBJ_FILES)
 
 
 # build lib objects
-$(BUILDSRC)/%.o: $(LIBDIR)/%.cpp
+$(BUILDSRC)/%.o: $(LIBDIR)/%.cpp $(LIBHEADERS)
 	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 # build main object
-$(BUILDAPP)/%.o: $(SRCDIR)/%.cpp
+$(BUILDAPP)/%.o: $(SRCDIR)/%.cpp $(LIBHEADERS)
 	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 # build test object
-$(BUILDTEST)/%.o: $(TESTDIR)/%.cpp
+$(BUILDTEST)/%.o: $(TESTDIR)/%.cpp $(LIBHEADERS)
 	g++ -lgtest $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<

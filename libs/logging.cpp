@@ -83,10 +83,12 @@ int table_from_file(std::map<int, float> &q_table)
       {
         key = line.substr(0, it);
         value = line.substr(it + 1);
-        try{
+        try
+        {
           q_table[std::stoi(key)] = std::stof(value);
         }
-        catch (std::invalid_argument){
+        catch (std::invalid_argument)
+        {
           std::cout << "Model corrupted\n";
           instream.close();
           return EXIT_FAILURE;

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <stdlib.h>
 #include "board.hpp"
 #include "constants.hpp"
 
-class Game {
+class Game
+{
 private:
   t_board tic_tac_toe;
   int current_player;
@@ -13,50 +15,62 @@ private:
 public:
   Game() { this->reset(); };
 
-  void reset() {
+  void reset()
+  {
     tic_tac_toe = {board::EMPTY_SQUARE};
-    current_player = board::PLAYER1;
+    current_player = (rand() % 2) ? board::PLAYER1 : board::PLAYER2;
     move_counter = 0;
     is_active = true;
   }
 
   int player() { return current_player; }
 
-  void swap_player() {
-    if (current_player == board::PLAYER1) {
+  void swap_player()
+  {
+    if (current_player == board::PLAYER1)
+    {
       current_player = board::PLAYER2;
-    } else {
+    }
+    else
+    {
       current_player = board::PLAYER1;
     }
   }
 
-  bool is_finished(int row, int column, t_player player) {
+  bool is_finished(int row, int column, t_player player)
+  {
     return check_board(row, column, player, tic_tac_toe);
   }
 
-  bool is_full() {
+  bool is_full()
+  {
     const int number_of_squares = 9;
     return move_counter == number_of_squares;
   }
 
   void increment_move_cnt() { move_counter++; }
 
-  bool is_valid_move(const int row, const int column) {
+  bool is_valid_move(const int row, const int column)
+  {
     return tic_tac_toe[column][row] == board::EMPTY_SQUARE;
   }
 
-  status make_valid_move(int row, int column) {
+  status make_valid_move(int row, int column)
+  {
     tic_tac_toe[column][row] = player();
     increment_move_cnt();
-    if (is_finished(row, column, player())) {
+    if (is_finished(row, column, player()))
+    {
       is_active = false;
-      return status::FINISHED;
+      return (current_player == board::PLAYER1) ? status::WIN_PLAYER1 : status::WIN_PLAYER2;
     }
     return status::IDLE;
   }
 
-  status play(int action, t_board &observation, t_player &current_player) {
-    if (action < 0 || action > 8) {
+  status play(int action, t_board &observation, t_player &current_player)
+  {
+    if (action < 0 || action > 8)
+    {
       is_active = false;
       return status::INVALID_MOVE;
     }
@@ -65,10 +79,13 @@ public:
     const int column = action / 3;
     status st{status::IDLE};
 
-    if (is_valid_move(row, column)) {
+    if (is_valid_move(row, column))
+    {
       st = make_valid_move(row, column);
       swap_player();
-    } else {
+    }
+    else
+    {
       is_active = false;
       st = status::INVALID_MOVE;
     }
@@ -76,21 +93,24 @@ public:
     current_player = player();
     observation = tic_tac_toe;
 
-    if (is_full()) {
+    if (is_full())
+    {
       is_active = false;
       return status::FINISHED;
     }
     return st;
   }
 
-  void set_board(t_board new_board, t_player new_player) {
+  void set_board(t_board new_board, t_player new_player)
+  {
     tic_tac_toe = new_board;
     current_player = new_player;
   }
 
   void observe(t_board &board) { board = tic_tac_toe; }
 
-  friend std::ostream &operator<<(std::ostream &os, Game &G) {
+  friend std::ostream &operator<<(std::ostream &os, Game &G)
+  {
     os << print_board(G.tic_tac_toe);
     return os;
   }

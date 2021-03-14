@@ -4,8 +4,16 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <algorithm>
 
 #include "player_util.hpp"
+#include "logging.hpp"
+#include "print.hpp"
+
+bool sort_pair(const std::pair<int, float> &a, const std::pair<int, float> &b)
+{
+  return (a.second < b.second);
+}
 
 class Q_table
 {
@@ -26,7 +34,29 @@ public:
     return it->second;
   }
 
+  void save_model()
+  {
+    table_to_file(table);
+  }
+
+  void load_model()
+  {
+    table_from_file(table);
+  }
+
   float &operator[](int key) { return table[key]; }
+
+  friend std::ostream &operator<<(std::ostream &os, Q_table &Q)
+  {
+    for (auto el : Q.table)
+    {
+      if (el.second != 0)
+      {
+        os << el.first << " : " << el.second << std::endl;
+      }
+    }
+    return os;
+  }
 };
 
 class Q_learning
@@ -42,11 +72,18 @@ public:
     prev_state = 0;
   }
 
-  std::pair<int, float> best_next_move(int board_state, int player)
+  std::vector<std::pair<int, float>> possible_moves(t_board board, int player)
   {
-    std::pair<int, float> value{0, -100};
-    t_board board;
-    from_board_state(board_state, board);
+    std::vector<std::pair<int, float>> value;
+    std::vector<int> all_legal_moves = legal_moves(board);
+
+    if (all_legal_moves.size() < 2)
+    {
+      int board_id = to_board_state(board);
+      float reward = table[board_id];
+      return {{board_id, reward}};
+    }
+
     for (int move : legal_moves(board))
     {
       int row = move % 3;
@@ -57,12 +94,33 @@ public:
 
       int new_state_id = to_board_state(virtual_board);
       float new_value = table[new_state_id];
-      if (new_value > value.second)
-      {
-        value = {move, new_value};
-      }
+      value.push_back({move, new_value});
     }
     return value;
+  }
+
+  std::pair<int, float> best_next_move(int board_state, int player)
+  {
+    t_board board;
+    from_board_state(board_state, board);
+    std::vector<std::pair<int, float>> ranked_moves = possible_moves(board, player);
+    std::sort(ranked_moves.begin(), ranked_moves.end(), sort_pair);
+    return ranked_moves.back();
+  }
+
+  int best_random_move(int board_state, int player)
+  {
+    int random_amplitude = 1;
+
+    t_board board;
+    from_board_state(board_state, board);
+    std::vector<std::pair<int, float>> ranked_moves = possible_moves(board, player);
+    for (auto &el : ranked_moves)
+    {
+      el.second += (rand() % 2 * random_amplitude) - random_amplitude;
+    }
+    std::sort(ranked_moves.begin(), ranked_moves.end(), sort_pair);
+    return ranked_moves.back().first;
   }
 
   void learn(t_board &board, float reward, int player)
@@ -75,5 +133,20 @@ public:
             (reward + discount_factor * next_move.second - table[state]);
 
     int action = next_move.first;
+  }
+
+  void save_model()
+  {
+    table.save_model();
+  }
+
+  void load_model()
+  {
+    table.load_model();
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, Q_learning &Q)
+  {
+    return os << Q.table;
   }
 };
