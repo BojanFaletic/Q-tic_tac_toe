@@ -2,7 +2,7 @@
 
 int main()
 {
-  srand(time(NULL));
+  srand(static_cast<uint>(time(NULL)));
   //srand(12345);
 
   //train_random();

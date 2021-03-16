@@ -28,7 +28,7 @@ TEST_FILES := $(patsubst $(TESTDIR)/%.cpp,$(BUILDTEST)/%.o,$(TESTFILES))
 CC=clang++
 LDFLAGS=
 CPPFLAGS=--std=c++20 -I./libs
-CXXFLAGS:=$(CXXFLAGS) -Wall -Wextra
+CXXFLAGS:=$(CXXFLAGS) -Werror -Wall -Wextra -Wconversion -Wunreachable-code -Wuninitialized -pedantic-errors -Wold-style-cast -Wno-error=unused-variable
 
 ifdef DBG_FLAG
 	CXXFLAGS := $(CXXFLAGS) -g

@@ -52,9 +52,9 @@ int table_to_file(std::map<int, float> &q_table, int player_id)
     return EXIT_FAILURE;
   }
 
-  int size_of_map = q_table.size();
-  int idx = 0;
-  float TH = 1e-10;
+  std::size_t size_of_map = q_table.size();
+  uint idx = 0;
+  float TH = 1e-10F;
 
   if (outfile.is_open())
   {

@@ -20,10 +20,10 @@ void print(std::vector<int> v)
   std::cout << '\n';
 }
 
-void print_header(int n)
+void print_header(std::size_t n)
 {
   const char *header = "---+---+---";
-  for (int i = 0; i < n; i++)
+  for (ulong i = 0; i < n; i++)
   {
     std::cout << header << space;
   }
@@ -53,15 +53,15 @@ void print_score(std::vector<std::pair<int, float>> score)
   }
 }
 
-void print_line(std::vector<t_board> &b, int row_num, bool use_number)
+void print_line(std::vector<t_board> &b, std::size_t row_num, bool use_number)
 {
   const char *vertical_line = " | ";
   const char *small_seperator = " ";
 
   for (unsigned int j = 0; j < 3 * b.size(); j++)
   {
-    int k = j % 3;
-    int board_id = j / 3;
+    std::size_t k = j % 3;
+    std::size_t board_id = j / 3;
 
     if (k == 1 || k == 2)
     {
@@ -71,7 +71,7 @@ void print_line(std::vector<t_board> &b, int row_num, bool use_number)
     {
       std::cout << small_seperator;
     }
-    int idx = row_num * 3 + k;
+    int idx = static_cast<int>(row_num * 3 + k);
     print_player(b[board_id][row_num][k], use_number, idx);
 
     if (k == 2)

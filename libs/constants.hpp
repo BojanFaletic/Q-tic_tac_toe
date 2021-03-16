@@ -21,9 +21,9 @@ enum status
 
 namespace reward
 {
-  const float NONE = 0;
-  const float WIN = 10;
-  const float LOOSE = -10;
+  const float NONE = -0.1F;
+  const float WIN = 10.F;
+  const float LOOSE = -10.F;
 }
 
 namespace symbols

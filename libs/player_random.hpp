@@ -16,7 +16,7 @@ public:
     {
       return status::INVALID_MOVE;
     }
-    int choice = rand() % valid_moves.size();
+    std::size_t choice = static_cast<std::size_t>(rand() % static_cast<int>(valid_moves.size()));
     return valid_moves[choice];
   }
 };

@@ -87,12 +87,12 @@ public:
 
   void increment_move_cnt() { move_counter++; }
 
-  bool is_valid_move(const int row, const int column)
+  bool is_valid_move(ulong row, ulong column)
   {
     return tic_tac_toe[column][row] == board::EMPTY_SQUARE;
   }
 
-  status make_valid_move(int row, int column)
+  status make_valid_move(ulong row, ulong column)
   {
     tic_tac_toe[column][row] = player();
     increment_move_cnt();
@@ -127,8 +127,8 @@ public:
       return board_status;
     }
 
-    const int row = action % 3;
-    const int column = action / 3;
+    const ulong row = static_cast<ulong>(action) % 3;
+    const ulong column = static_cast<ulong>(action) / 3;
 
     if (is_valid_move(row, column))
     {

@@ -22,9 +22,9 @@ void tournament_summary(int n_games, int wins_p1, int wins_p2)
 {
   int draws = n_games - (wins_p1 + wins_p2);
 
-  int percentage_w1 = (float)wins_p1 / (float)n_games * 100;
-  int percentage_w2 = (float)wins_p2 / (float)n_games * 100;
-  int percentage_draw = (float)draws / (float)n_games * 100;
+  int percentage_w1 = 100 * wins_p1 / n_games;
+  int percentage_w2 = 100 *wins_p2 / n_games;
+  int percentage_draw = 100 * draws / n_games;
 
   auto print_percent = [](int x) { return std::string(" (") + std::to_string(x) + std::string("%)\n"); };
 

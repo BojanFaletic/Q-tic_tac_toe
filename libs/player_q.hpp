@@ -5,8 +5,8 @@
 class Player_q : public Player
 {
 private:
-  float alpha = 0.1;
-  float gamma = 0.5;
+  float alpha = 0.1F;
+  float gamma = 0.5F;
 
   static bool sort_pair(const std::pair<int, float> &a, const std::pair<int, float> &b)
   {
@@ -36,8 +36,6 @@ public:
       return (player == board::PLAYER1) ? reward::WIN : reward::LOOSE;
     case status::WIN_PLAYER2:
       return (player == board::PLAYER2) ? reward::WIN : reward::LOOSE;
-    case status::IDLE:
-      return -0.1;
     default:
       return reward::NONE;
     }
@@ -96,7 +94,6 @@ public:
     {
       Q_old = 50;
     }
-    // std::cout << "Q[" << new_state << "]: " << Q_old << '\n';
   }
 
   std::pair<int, float> best_next_move(int board_state, int player)
@@ -110,7 +107,7 @@ public:
 
   int best_random_move(int board_state, int player)
   {
-    int random_amplitude = 1;
+    const float random_amplitude = 1.F;
 
     t_board board;
     from_board_state(board_state, board);
@@ -142,8 +139,8 @@ public:
 
     for (int move : legal_moves(board))
     {
-      int row = move % 3;
-      int column = move / 3;
+      ulong row = static_cast<ulong>(move % 3);
+      ulong column = static_cast<ulong>(move / 3);
 
       t_board virtual_board = board;
       virtual_board[column][row] = player;

@@ -9,13 +9,13 @@ const int player_1 = 2;
 std::vector<int> legal_moves(t_board &board)
 {
   std::vector<int> valid;
-  for (int i = 0; i < 3; i++)
+  for (std::size_t i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++)
+    for (std::size_t j = 0; j < 3; j++)
     {
       if (board[i][j] == board::EMPTY_SQUARE)
       {
-        valid.push_back(i * 3 + j);
+        valid.push_back(static_cast<int>(i * 3 + j));
       }
     }
   }
@@ -51,12 +51,12 @@ int ID_to_player(int id)
 int to_board_state(t_board &board)
 {
   int board_idx = 0;
-  for (int i = 0; i < 3; i++)
+  for (std::size_t i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++)
+    for (std::size_t j = 0; j < 3; j++)
     {
-      int idx = i * 3 + j;
-      board_idx += std::pow(3, idx) * player_to_ID(board[i][j]);
+      std::size_t idx = i * 3 + j;
+      board_idx += static_cast<int>(std::pow(3, idx) * player_to_ID(board[i][j]));
     }
   }
   return board_idx;
@@ -64,9 +64,9 @@ int to_board_state(t_board &board)
 
 void from_board_state(int board_state, t_board &board)
 {
-  for (int i = 0; i < 3; i++)
+  for (std::size_t i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++)
+    for (std::size_t j = 0; j < 3; j++)
     {
       int square_id = board_state % 3;
       board_state /= 3;
