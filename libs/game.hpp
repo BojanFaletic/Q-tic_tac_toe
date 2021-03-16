@@ -1,10 +1,9 @@
 #pragma once
 
 #include <stdlib.h>
+#include "print.hpp"
 #include "board.hpp"
 #include "constants.hpp"
-#include "print.hpp"
-#include <algorithm>
 
 class Game
 {
@@ -157,6 +156,10 @@ public:
   {
     tic_tac_toe = new_board;
     current_player = new_player;
+  }
+
+  t_board get_board(){
+    return tic_tac_toe;
   }
 
   void observe(t_board &board) { board = tic_tac_toe; }

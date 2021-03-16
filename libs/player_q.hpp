@@ -1,12 +1,14 @@
 #pragma once
 
 #include "player.hpp"
+#include <assert.h>
 
 class Player_q : public Player
 {
 private:
   float alpha = 0.1F;
-  float gamma = 0.5F;
+  float gamma = 0.9F;
+  float exploration = 0.1F;
 
   static bool sort_pair(const std::pair<int, float> &a, const std::pair<int, float> &b)
   {
@@ -41,14 +43,29 @@ public:
     }
   }
 
+  bool explore(){
+    return (rand() % 101) < static_cast<int>(exploration*100);
+  }
+
+  int select_random_action(t_board &board){
+    std::vector<std::pair<int, float>> ranked_moves = possible_moves(board, player);
+    assert(ranked_moves.size()>0);
+    std::size_t random_idx = static_cast<ulong>(rand()) % ranked_moves.size();
+    return ranked_moves[random_idx].first;
+  }
+
   int play(t_board &board) override
   {
     int board_state = to_board_state(board);
-    auto best_move = best_next_move(board_state, player);
+    int best_move = best_next_move(board_state, player).first;
+
+    if (explore()){
+      best_move = select_random_action(board);
+    }
 
     old_state = board_state;
 
-    return best_move.first;
+    return best_move;
   }
 
   void swap_player(status &st)
@@ -76,23 +93,16 @@ public:
 
   void learn(int new_state, float best_reward, float reward, bool is_terminal)
   {
-    float &Q_old = Q[new_state];
+    float &Q_new = Q[new_state];
 
     if (is_terminal)
     {
-      Q_old = reward;
+      Q_new = reward;
     }
     else
     {
-      Q_old = (1 - alpha) * Q[old_state] + alpha * (reward + gamma * best_reward);
-    }
-    if (Q_old < -50)
-    {
-      Q_old = -50;
-    }
-    else if (Q_old > 50)
-    {
-      Q_old = 50;
+      Q_new = (1 - alpha) * Q[old_state] + alpha * (reward + gamma * best_reward);
+      assert(!(Q_new<reward::LOOSE || Q_new>reward::WIN));
     }
   }
 
@@ -160,6 +170,5 @@ public:
   void load_model()
   {
     Q.load_model();
-    std::cout << Q;
   }
 };

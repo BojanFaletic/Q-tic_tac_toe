@@ -111,3 +111,50 @@ void print_board(std::vector<t_board> &b, bool use_numbers)
   print_header(b.size());
   print_line(b, 2, use_numbers);
 }
+
+void winning_screen(status st, t_board board)
+{
+  std::cout << "\n";
+  std::cout << "--------------------\n";
+  std::cout << "End of game "
+            << " " << winner(st) << std::endl;
+  print_board(board);
+  std::cout << "--------------------\n";
+  std::cout << "\n";
+}
+
+void display_move(bool is_p1_moved, int action, t_board board)
+{
+  std::cout << ((is_p1_moved) ? "P2" : "P1") << " action: " << action
+            << std::endl;
+  print_board(board);
+}
+
+void tournament_summary(int n_games, int wins_p1, int wins_p2)
+{
+  int draws = n_games - (wins_p1 + wins_p2);
+
+  int percentage_w1 = 100 * wins_p1 / n_games;
+  int percentage_w2 = 100 * wins_p2 / n_games;
+  int percentage_draw = 100 * draws / n_games;
+
+  auto print_percent = [](int x) { return std::string(" (") + std::to_string(x) + std::string("%)\n"); };
+
+  std::cout << "Number of games: " << n_games << std::endl;
+  std::cout << "Wins p1: " << wins_p1 << print_percent(percentage_w1);
+  std::cout << "Wins p2: " << wins_p2 << print_percent(percentage_w2);
+  std::cout << "Draws: " << draws << print_percent(percentage_draw);
+}
+
+std::string winner(status st)
+{
+  if (st == status::WIN_PLAYER1)
+  {
+    return std::string("WIN: ") + symbols::PLAYER1;
+  }
+  if (st == status::WIN_PLAYER2)
+  {
+    return std::string("WIN: ") + symbols::PLAYER2;
+  }
+  return "Draw";
+}

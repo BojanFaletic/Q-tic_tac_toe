@@ -28,10 +28,6 @@ public:
     {
       return status::INVALID_MOVE;
     }
-    std::cout << "------\n";
-    std::cout << "legal moves:\n";
-    print(valid_moves);
-    std::cout << "------\n";
     return valid_moves.back();
   }
 

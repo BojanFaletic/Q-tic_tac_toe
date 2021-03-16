@@ -5,6 +5,7 @@ int main()
   srand(static_cast<uint>(time(NULL)));
   //srand(12345);
 
+  train();
   //train_random();
   //user_turnament();
   //debug_play();
