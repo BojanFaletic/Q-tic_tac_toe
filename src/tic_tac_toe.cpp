@@ -2,12 +2,11 @@
 
 int main()
 {
-
   srand(time(NULL));
   //srand(12345);
 
-  //train(true);
+  //train_random();
   //user_turnament();
-  train_random();
-  //user_turnament();
+  //debug_play();
+  //debug_single_move();
 }

@@ -5,14 +5,16 @@
 class Player_q : public Player
 {
 private:
-  int old_state;
-  float alpha = 0.9;
-  float gamma = 0.9;
+  float alpha = 0.1;
+  float gamma = 0.5;
 
   static bool sort_pair(const std::pair<int, float> &a, const std::pair<int, float> &b)
   {
     return (a.second < b.second);
   }
+
+protected:
+  int old_state;
 
 public:
   Q_table Q;
@@ -34,41 +36,67 @@ public:
       return (player == board::PLAYER1) ? reward::WIN : reward::LOOSE;
     case status::WIN_PLAYER2:
       return (player == board::PLAYER2) ? reward::WIN : reward::LOOSE;
+    case status::IDLE:
+      return -0.1;
     default:
       return reward::NONE;
     }
   }
 
-  int play(t_board &board) final
+  int play(t_board &board) override
   {
     int board_state = to_board_state(board);
-    int best_next_action = best_next_move(board_state, player).first;
+    auto best_move = best_next_move(board_state, player);
 
     old_state = board_state;
 
-    return best_next_action;
+    return best_move.first;
   }
 
-  void swap_player(status &st){
-    if (st == status::WIN_PLAYER1){
+  void swap_player(status &st)
+  {
+    if (st == status::WIN_PLAYER1)
+    {
       st = status::WIN_PLAYER2;
     }
-    else if (st == status::WIN_PLAYER2){
+    else if (st == status::WIN_PLAYER2)
+    {
       st = status::WIN_PLAYER1;
     }
   }
 
-  void observe(status st, t_board &board) final
+  void observe(status st, t_board &board) override
   {
-    swap_player(st);
     int new_state = to_board_state(board);
     float reward = calculate_reward(st);
-    learn(old_state, new_state, reward);
+
+    float best_q = best_next_move(old_state, player).second;
+    bool is_finished = st == status::FINISHED;
+
+    learn(new_state, best_q, reward, is_finished);
   }
 
-  void learn(int old_state, int new_state, float reward)
+  void learn(int new_state, float best_reward, float reward, bool is_terminal)
   {
-    Q[old_state] = Q[old_state] + alpha * (reward + gamma * Q[new_state] - Q[old_state]);
+    float &Q_old = Q[new_state];
+
+    if (is_terminal)
+    {
+      Q_old = reward;
+    }
+    else
+    {
+      Q_old = (1 - alpha) * Q[old_state] + alpha * (reward + gamma * best_reward);
+    }
+    if (Q_old < -50)
+    {
+      Q_old = -50;
+    }
+    else if (Q_old > 50)
+    {
+      Q_old = 50;
+    }
+    // std::cout << "Q[" << new_state << "]: " << Q_old << '\n';
   }
 
   std::pair<int, float> best_next_move(int board_state, int player)
@@ -99,12 +127,17 @@ public:
   {
     std::vector<std::pair<int, float>> value;
     std::vector<int> all_legal_moves = legal_moves(board);
+    if (all_legal_moves.empty())
+    {
+      print_board(board);
+      throw "No valid moves found!";
+    }
 
-    if (all_legal_moves.size() < 2)
+    if (all_legal_moves.size() == 1)
     {
       int board_id = to_board_state(board);
       float reward = Q[board_id];
-      return {{board_id, reward}};
+      return {{all_legal_moves.back(), reward}};
     }
 
     for (int move : legal_moves(board))
@@ -130,5 +163,6 @@ public:
   void load_model()
   {
     Q.load_model();
+    std::cout << Q;
   }
 };

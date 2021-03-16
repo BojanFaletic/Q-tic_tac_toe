@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "board.hpp"
 #include "constants.hpp"
+#include "print.hpp"
+#include <algorithm>
 
 class Game
 {
@@ -13,6 +15,7 @@ private:
   int move_counter;
   int player_1_wins, player_2_wins;
   int total_games;
+  status board_status;
 
 public:
   Game()
@@ -20,16 +23,34 @@ public:
     player_1_wins = 0;
     player_2_wins = 0;
     total_games = 0;
-    this->reset();
+    board_status = init_status();
+    reset();
   };
+
+  Game(t_board brd, int player)
+  {
+    player_1_wins = 0;
+    player_2_wins = 0;
+    total_games = 0;
+    tic_tac_toe = brd;
+    current_player = player;
+    is_active = is_finished();
+    move_counter = 0;
+    board_status = init_status();
+  }
+
+  status init_status()
+  {
+    return full_check(tic_tac_toe);
+  }
 
   void reset()
   {
-    tic_tac_toe = {board::EMPTY_SQUARE};
+    clear_board(tic_tac_toe);
     current_player = (rand() % 2) ? board::PLAYER1 : board::PLAYER2;
     move_counter = 0;
     total_games++;
-    is_active = true;
+    is_active = is_finished();
   }
 
   int player() { return current_player; }
@@ -46,15 +67,22 @@ public:
     }
   }
 
-  bool is_finished(int row, int column, t_player player)
+  bool is_finished()
   {
-    return check_board(row, column, player, tic_tac_toe);
+    board_status = full_check(tic_tac_toe);
+    return board_status != status::IDLE || is_full();
   }
 
   bool is_full()
   {
-    const int number_of_squares = 9;
-    return move_counter == number_of_squares;
+    for (auto &row:tic_tac_toe){
+      for (auto el:row){
+        if (el==board::EMPTY_SQUARE){
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   void increment_move_cnt() { move_counter++; }
@@ -68,7 +96,7 @@ public:
   {
     tic_tac_toe[column][row] = player();
     increment_move_cnt();
-    if (is_finished(row, column, player()))
+    if (is_finished())
     {
       is_active = false;
       status st = (current_player == board::PLAYER1) ? status::WIN_PLAYER1 : status::WIN_PLAYER2;
@@ -85,27 +113,33 @@ public:
     return status::IDLE;
   }
 
+  status check_status()
+  {
+    return status::WIN_PLAYER1;
+  }
+
   status play(int action, t_board &observation, t_player &current_player)
   {
     if (action < 0 || action > 8)
     {
       is_active = false;
-      return status::INVALID_MOVE;
+      board_status = status::INVALID_MOVE;
+      return board_status;
     }
 
     const int row = action % 3;
     const int column = action / 3;
-    status st{status::IDLE};
 
     if (is_valid_move(row, column))
     {
-      st = make_valid_move(row, column);
+      board_status = make_valid_move(row, column);
       swap_player();
     }
     else
     {
       is_active = false;
-      st = status::INVALID_MOVE;
+      board_status = status::INVALID_MOVE;
+      return board_status;
     }
 
     current_player = player();
@@ -114,9 +148,9 @@ public:
     if (is_full())
     {
       is_active = false;
-      return status::FINISHED;
+      board_status = status::FINISHED;
     }
-    return st;
+    return board_status;
   }
 
   void set_board(t_board new_board, t_player new_player)
@@ -127,20 +161,30 @@ public:
 
   void observe(t_board &board) { board = tic_tac_toe; }
 
-  void number_of_wins(int &p1_wins, int &p2_wins){
+  void number_of_wins(int &p1_wins, int &p2_wins)
+  {
     p1_wins = player_1_wins;
     p2_wins = player_2_wins;
   }
 
-  int number_of_games(){
-    return total_games-1;
+  int number_of_games()
+  {
+    return total_games - 1;
   }
 
   friend std::ostream &operator<<(std::ostream &os, Game &G)
   {
-    os << print_board(G.tic_tac_toe);
+    print_board(G.tic_tac_toe);
     return os;
   }
 
-  bool is_game_active() { return is_active; }
+  status get_status()
+  {
+    return board_status;
+  }
+
+  bool is_game_active()
+  {
+    return !is_finished();
+  }
 };

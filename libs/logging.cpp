@@ -1,4 +1,5 @@
 #include "logging.hpp"
+#include "print.hpp"
 
 const char *q_table_fname = "model/q_table.dat";
 const char *q_table_fname_p1 = "model/q_table_p1.dat";
@@ -6,7 +7,7 @@ const char *q_table_fname_p2 = "model/q_table_p2.dat";
 
 int split_name_and_path(std::string full_fname, std::string &folder, std::string &name)
 {
-  int split_idx = full_fname.rfind('/');
+  std::size_t split_idx = full_fname.rfind('/');
   if (split_idx != std::string::npos)
   {
     folder = full_fname.substr(0, split_idx);
@@ -53,11 +54,13 @@ int table_to_file(std::map<int, float> &q_table, int player_id)
 
   int size_of_map = q_table.size();
   int idx = 0;
+  float TH = 1e-10;
+
   if (outfile.is_open())
   {
     for (auto it = q_table.begin(); it != q_table.end(); it++)
     {
-      if (it->second == 0)
+      if (std::abs(it->second) < TH)
       {
         continue;
       }
@@ -107,7 +110,7 @@ int table_from_file(std::map<int, float> &q_table, int player_id)
     while (std::getline(instream, line))
     {
       std::string key, value;
-      int it = line.rfind(':');
+      std::size_t it = line.rfind(':');
       if (it != std::string::npos)
       {
         key = line.substr(0, it);
@@ -120,6 +123,12 @@ int table_from_file(std::map<int, float> &q_table, int player_id)
         {
           std::cout << "Model corrupted\n";
           instream.close();
+          return EXIT_FAILURE;
+        }
+        catch (std::out_of_range)
+        {
+          std::cout << "Out of range\n";
+          std::cout << "Value: " << value << '\n';
           return EXIT_FAILURE;
         }
       }

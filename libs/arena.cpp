@@ -54,9 +54,9 @@ void turnament(Player &p1, Player &p2, Game &g, bool verbose_moves, bool verbose
   t_action action;
   status st;
 
-  g.reset();
   g.observe(obs_board);
   current_player = g.player();
+  int timeout = 10;
 
   while (g.is_game_active())
   {
@@ -77,11 +77,15 @@ void turnament(Player &p1, Player &p2, Game &g, bool verbose_moves, bool verbose
     {
       display_move(p1 == current_player, action, g);
     }
+    if (timeout--==0){
+      break;
+    }
   }
   if (verbose_game)
   {
-    winning_screen(st, g);
+    winning_screen(g.get_status(), g);
   }
+  g.reset();
 }
 
 void user_turnament()
@@ -137,7 +141,7 @@ void train()
 
 void train_random()
 {
-  const int n_games = 50000;
+  const int n_games = 10000;
   const int epoch = 10;
 
   Player_q p1{board::PLAYER1};
@@ -188,4 +192,29 @@ void play_n_games(Player &p1, Player &p2, Game &g, int n_games, bool print_summa
     int cnt_games = g.number_of_games();
     tournament_summary(cnt_games, wins_player1, wins_player2);
   }
+}
+
+void debug_play()
+{
+  Player_q p1{board::PLAYER1};
+  Player p2{board::PLAYER2};
+  Game g;
+
+  p1.load_model();
+  play_n_games(p1, p2, g, 1, true);
+
+  p1.save_model();
+  std::cout << g;
+}
+
+
+void debug_single_move(){
+  Player_q p1{board::PLAYER1};
+  Player p2{board::PLAYER2};
+  Game g;
+
+  p1.load_model();
+  turnament(p1, p2, g, true, true);
+  p1.save_model();
+
 }

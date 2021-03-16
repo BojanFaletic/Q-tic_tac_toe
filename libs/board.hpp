@@ -4,5 +4,5 @@
 #include <sstream>
 
 bool check_board(int row, int column, int player, t_board &tic_tac_toe);
-const std::string print_board(t_board &b);
-const std::string print_board_with_numbers(t_board &b);
+status full_check(t_board &board);
+void clear_board(t_board &board);

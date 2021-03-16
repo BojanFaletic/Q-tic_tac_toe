@@ -18,3 +18,5 @@ void computer_turnament();
 void train();
 void evaluate();
 void train_random();
+void debug_play();
+void debug_single_move();

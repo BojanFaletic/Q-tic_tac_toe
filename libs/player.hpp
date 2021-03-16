@@ -28,11 +28,16 @@ public:
     {
       return status::INVALID_MOVE;
     }
+    std::cout << "------\n";
+    std::cout << "legal moves:\n";
+    print(valid_moves);
+    std::cout << "------\n";
     return valid_moves.back();
   }
 
   virtual void observe(status st, t_board &board){
-
+    (void)st;
+    (void)board;
   };
 
   int is_winner(status st)

@@ -2,7 +2,6 @@
 tic_tac_toe
 test
 *.py
-.vscode
 *.asm
 
 # Ignore build folder

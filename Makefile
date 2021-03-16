@@ -1,4 +1,4 @@
-.PHONY: clean check run help build
+.PHONY: clean check run help build syntax
 .DEFAULT_GOAL := run
 
 ### FILE STRUCTURE ###
@@ -25,9 +25,17 @@ TEST_FILES := $(patsubst $(TESTDIR)/%.cpp,$(BUILDTEST)/%.o,$(TESTFILES))
 
 
 ### COMPILER FLAGS ###
+CC=clang++
 LDFLAGS=
 CPPFLAGS=--std=c++20 -I./libs
-CXXFLAGS=-O3
+CXXFLAGS:=$(CXXFLAGS) -Wall -Wextra
+
+ifdef DBG_FLAG
+	CXXFLAGS := $(CXXFLAGS) -g
+else
+	CXXFLAGS := $(CXXFLAGS) -O3
+endif
+
 
 
 ### PROJECT
@@ -67,21 +75,21 @@ help:
 
 # build project
 $(PROJECT): $(SRC_FILES) $(OBJ_FILES)
-	g++ $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 # build test
 $(TEST): $(TEST_FILES) $(OBJ_FILES)
-	g++ -lgtest $(LDFLAGS) -o $@ $^
+	$(CC) -lgtest $(LDFLAGS) -o $@ $^
 
 
 # build lib objects
 $(BUILDSRC)/%.o: $(LIBDIR)/%.cpp $(LIBHEADERS)
-	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 # build main object
 $(BUILDAPP)/%.o: $(SRCDIR)/%.cpp $(LIBHEADERS)
-	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 # build test object
 $(BUILDTEST)/%.o: $(TESTDIR)/%.cpp $(LIBHEADERS)
-	g++ -lgtest $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CC) -lgtest $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<

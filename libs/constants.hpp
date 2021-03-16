@@ -30,6 +30,7 @@ namespace symbols
 {
   const char PLAYER1 = 'X';
   const char PLAYER2 = 'Y';
+  const char BLANK = ' ';
 }
 
 using t_board = std::array<std::array<int, 3>, 3>;

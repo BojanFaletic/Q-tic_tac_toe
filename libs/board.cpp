@@ -1,4 +1,5 @@
 #include "board.hpp"
+#include "print.hpp"
 
 bool check_row(int row, int player, t_board &tic_tac_toe)
 {
@@ -69,87 +70,98 @@ bool check_board(int row, int column, int player, t_board &tic_tac_toe)
          check_line(row, column, player, tic_tac_toe);
 }
 
-const std::string print_board(t_board &b)
+int check_row(t_board &board, int row)
 {
-  std::stringstream os;
-  for (int i = 0; i < 3; i++)
+  if (board[row][0] != board::EMPTY_SQUARE &&
+      board[row][0] == board[row][1] &&
+      board[row][1] == board[row][2])
   {
-    if (i > 0)
-    {
-      os << " ----+---+----\n";
-    }
-    else
-    {
-      os << '\n';
-    }
-    for (int j = 0; j < 3; j++)
-    {
-      if (j > 0)
-      {
-        os << " | ";
-      }
-      else
-      {
-        os << "   ";
-      }
-      if (b[i][j] == board::PLAYER1)
-      {
-        os << symbols::PLAYER1;
-      }
-      else if (b[i][j] == board::PLAYER2)
-      {
-        os << symbols::PLAYER2;
-      }
-      else
-      {
-        os << " ";
-      }
-    }
-    os << " \n";
+    return board[row][0];
   }
-  os << std::endl;
-  return os.str();
+  return board::EMPTY_SQUARE;
 }
 
-const std::string print_board_with_numbers(t_board &b)
+int check_column(t_board &board, int column)
 {
-  std::stringstream os;
+  if (board[0][column] != board::EMPTY_SQUARE &&
+      board[0][column] == board[1][column] &&
+      board[1][column] == board[2][column])
+  {
+    return board[0][column];
+  }
+  return board::EMPTY_SQUARE;
+}
+
+int check_diagonal_1(t_board &board)
+{
+  if (board[0][0] != board::EMPTY_SQUARE && board[0][0] == board[1][1] &&
+      board[1][1] == board[2][2])
+  {
+    return board[0][0];
+  }
+  return board::EMPTY_SQUARE;
+}
+
+int check_diagonal_2(t_board &board)
+{
+  if (board[0][2] != board::EMPTY_SQUARE && board[0][2] == board[1][1] &&
+      board[1][1] == board[2][0])
+  {
+    return board[0][2];
+  }
+  return board::EMPTY_SQUARE;
+}
+
+status board_2status(int brd)
+{
+  switch (brd)
+  {
+  case board::PLAYER1:
+    return status::WIN_PLAYER1;
+  case board::PLAYER2:
+    return status::WIN_PLAYER2;
+  default:
+    return status::IDLE;
+  }
+}
+
+status full_check(t_board &board)
+{
+  int st;
+  st = check_diagonal_1(board);
+  if (st != board::EMPTY_SQUARE)
+  {
+    return board_2status(st);
+  }
+  st = check_diagonal_2(board);
+  if (st != board::EMPTY_SQUARE)
+  {
+    return board_2status(st);
+  }
+
   for (int i = 0; i < 3; i++)
   {
-    if (i > 0)
+    st = check_row(board, i);
+    if (st != board::EMPTY_SQUARE)
     {
-      os << " ----+---+----\n";
+      return board_2status(st);
     }
-    else
+    st = check_column(board, i);
+    if (st != board::EMPTY_SQUARE)
     {
-      os << '\n';
+      return board_2status(st);
     }
-    for (int j = 0; j < 3; j++)
-    {
-      if (j > 0)
-      {
-        os << " | ";
-      }
-      else
-      {
-        os << "   ";
-      }
-      if (b[i][j] == board::PLAYER1)
-      {
-        os << symbols::PLAYER1;
-      }
-      else if (b[i][j] == board::PLAYER2)
-      {
-        os << symbols::PLAYER2;
-      }
-      else
-      {
-        int idx = i * 3 + j;
-        os << idx;
-      }
-    }
-    os << " \n";
   }
-  os << std::endl;
-  return os.str();
+  return board_2status(st);
+}
+
+void clear_board(t_board &board)
+{
+  for (auto &row : board)
+  {
+    for (auto &item : row)
+    {
+      item = board::EMPTY_SQUARE;
+    }
+  }
 }

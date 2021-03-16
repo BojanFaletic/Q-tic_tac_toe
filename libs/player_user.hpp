@@ -1,7 +1,7 @@
 #pragma once
 
 #include "player.hpp"
-#include "board.hpp"
+#include "print.hpp"
 
 class Player_user : public Player
 {
@@ -14,7 +14,7 @@ public:
   {
     std::cout << "Enter move!\n";
 
-    std::cout << print_board_with_numbers(board);
+    print_board(board, true);
     std::vector<int> all_legal_moves = legal_moves(board);
     print(all_legal_moves);
 
