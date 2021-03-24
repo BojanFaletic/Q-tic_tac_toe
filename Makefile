@@ -1,4 +1,4 @@
-.PHONY: clean check run help build syntax
+.PHONY: clean check run help build
 .DEFAULT_GOAL := run
 
 ### FILE STRUCTURE ###
@@ -28,7 +28,8 @@ TEST_FILES := $(patsubst $(TESTDIR)/%.cpp,$(BUILDTEST)/%.o,$(TESTFILES))
 CC=clang++
 LDFLAGS=
 CPPFLAGS=--std=c++20 -I./libs
-CXXFLAGS:=$(CXXFLAGS) -Werror -Wall -Wextra -Wconversion -Wunreachable-code -Wuninitialized -pedantic-errors -Wold-style-cast -Wno-error=unused-variable
+CXXFLAGS:=$(CXXFLAGS) -Werror -Wall -Wextra -Wconversion -Wunreachable-code \
+	-Wuninitialized -pedantic-errors -Wold-style-cast -Wno-error=unused-variable -Wunused
 
 ifdef DBG_FLAG
 	CXXFLAGS := $(CXXFLAGS) -g
