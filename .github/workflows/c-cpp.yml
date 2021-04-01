@@ -1,0 +1,47 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: sudo apt-get update; sudo apt-get install clang
+    - name: create dir
+      run: mkdir build build/obj
+    - name: make check
+      run: make check
+      
+    - name: badge-it
+    
+    - name: Code Inspector GitHub action
+      # You may pin to the exact commit or the version.
+      # uses: codeinspectorio/github-action@01c818be303e2c4bcec991ca1c51feab753a1e2a
+      uses: codeinspectorio/github-action@v1
+      with:
+        # Token to checkout the repository.
+        repo_token: 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
+        # Access key on Code Inspector
+        code_inspector_access_key: ZQ5QPNVGG5KC3RVKMBUD
+        # Secret key on Code Inspector
+        code_inspector_secret_key: lSUXqF0aKhrHkKrQPAVx
+        # Minimum grade. Valid options are EXCELLENT, GOOD, NEUTRAL, WARNING, CRITICAL. Leave blank to ignore.
+        min_quality_grade: 90
+        # Minimum quality score from 0 (worst) to 100 (best)
+        min_quality_score: 90
+        # Maximum defect rate per line of code (e.g. 0.01 for 1 defect per 100 lines of code). Leave 0 to ignore.
+        max_defects_rate: 0
+        # Maximum number of complex functions rate (e.g. number of complex functions / number of functions). Leave 0 to ignore.
+        max_complex_functions_rate: 0
+        # Maximum number of long functions rate (e.g. number of long functions / number of functions). Leave 0 to ignore.
+        max_long_functions_rate: 0
+        # Timeout before giving up (in case analysis takes too long). Default is 10 minutes
+        max_timeout_sec: 600
